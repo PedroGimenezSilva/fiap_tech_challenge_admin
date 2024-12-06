@@ -1,5 +1,7 @@
 package br.com.challenge.admin.admin.repository;
 
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +17,12 @@ public class ClienteRepository {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    /*
+     * teste de inserção de cliente
+     */
     public void save(Cliente cliente) {
-        String sql = "INSERT INTO clientes (nome, email) VALUES (?, ?)";
-        jdbcTemplate.update(sql, cliente.getNome(), cliente.getEmail());
+        String sql = "INSERT INTO clientes (nome, cpf, email, telefone, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sql, cliente.getNome(), cliente.getCpf(), cliente.getEmail(), cliente.getTelefone(), LocalDate.now(), LocalDate.now());  
     }
 
     /*
@@ -25,7 +30,7 @@ public class ClienteRepository {
      */
     public List<Cliente> findAll() {
         String sql = "SELECT * FROM clientes";
-        RowMapper<Cliente> rowMapper = (rs, rowNum) -> new Cliente(rs.getInt("id"), rs.getString("nome"), rs.getString("email"));
+        RowMapper<Cliente> rowMapper = (rs, rowNum) -> new Cliente(rs.getInt("id"), rs.getString("nome"), rs.getString("cpf"), rs.getString("email"), rs.getString("telefone"), rs.getObject("created_at", LocalDate.class), rs.getObject("updated_at", LocalDate.class));
         return jdbcTemplate.query(sql, rowMapper);
     }
 
@@ -41,7 +46,7 @@ public class ClienteRepository {
 
     public Cliente findById(int id) {
         String sql = "SELECT * FROM clientes WHERE id = ?";
-        RowMapper<Cliente> rowMapper = (rs, rowNum) -> new Cliente(rs.getInt("id"), rs.getString("nome"), rs.getString("email"));
+        RowMapper<Cliente> rowMapper = (rs, rowNum) -> new Cliente(rs.getInt("id"), rs.getString("nome"), rs.getString("cpf"), rs.getString("email"), rs.getString("telefone"), rs.getObject("created_at", LocalDate.class), rs.getObject("updated_at", LocalDate.class));
         return jdbcTemplate.queryForObject(sql, rowMapper, id);
     }
 }
