@@ -97,6 +97,14 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.10</version>
+                <configuration>
+                <excludes>
+                    <exclude>**/exceptions/*</exclude>
+                    <exclude>**/dto/produto/*</exclude>
+                    <exclude>**/domain/*</exclude>
+                    <exclude>**/admin/admin/AdminApplication*</exclude>
+                </excludes>
+            </configuration>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>

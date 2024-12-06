@@ -9,6 +9,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
@@ -106,5 +108,38 @@ class ClienteRepositoryTest {
         // Assert
         assertEquals(expectedCliente, actualCliente);
         verify(jdbcTemplate, times(1)).queryForObject(eq(expectedSql), any(RowMapper.class), eq(id));
+    }
+
+    @Test
+    void testFindAll2() {
+        // Arrange
+        String expectedSql = "SELECT * FROM clientes";
+        Cliente cliente1 = new Cliente(1, "John Doe", "12345678901", "john.doe@example.com", "11999999999", LocalDate.now(), LocalDate.now());
+        Cliente cliente2 = new Cliente(2, "Jane Doe", "98765432101", "jane.doe@example.com", "11988888888", LocalDate.now(), LocalDate.now());
+        List<Cliente> expectedClientes = Arrays.asList(cliente1, cliente2);
+
+        when(jdbcTemplate.query(eq(expectedSql), any(RowMapper.class))).thenAnswer(invocation -> {
+            RowMapper<Cliente> mapper = invocation.getArgument(1);
+            return Arrays.asList(mapper.mapRow(mockResultSet(cliente1), 0), mapper.mapRow(mockResultSet(cliente2), 1));
+        });
+
+        // Act
+        List<Cliente> actualClientes = clienteRepository.findAll();
+
+        // Assert
+        assertEquals(expectedClientes, actualClientes);
+        verify(jdbcTemplate, times(1)).query(eq(expectedSql), any(RowMapper.class));
+    }
+
+    private ResultSet mockResultSet(Cliente cliente) throws SQLException {
+        ResultSet resultSet = mock(ResultSet.class);
+        when(resultSet.getInt("id")).thenReturn(cliente.getId());
+        when(resultSet.getString("nome")).thenReturn(cliente.getNome());
+        when(resultSet.getString("cpf")).thenReturn(cliente.getCpf());
+        when(resultSet.getString("email")).thenReturn(cliente.getEmail());
+        when(resultSet.getString("telefone")).thenReturn(cliente.getTelefone());
+        when(resultSet.getObject("created_at", LocalDate.class)).thenReturn(cliente.getCreatedAt());
+        when(resultSet.getObject("updated_at", LocalDate.class)).thenReturn(cliente.getUpdatedAt());
+        return resultSet;
     }
 }

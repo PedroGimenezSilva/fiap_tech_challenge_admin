@@ -12,6 +12,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.math.BigDecimal;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -93,5 +95,48 @@ class ProdutoRepositoryTest {
         assertEquals(BigDecimal.valueOf(10.0), produto.getPreco());
 
         verify(jdbcTemplate, times(1)).queryForObject(anyString(), any(RowMapper.class), eq(1));
+    }
+
+    @Test
+    void testFindAll2() throws SQLException {
+        // Arrange
+        String expectedSql = "SELECT * FROM produtos";
+        Produto produto1 = new Produto(1, "Produto Teste 1", new BigDecimal("99.99"), "Descrição do Produto Teste 1", "imagem1.jpg", Categoria.LANCHE, LocalDate.now(), LocalDate.now());
+        Produto produto2 = new Produto(2, "Produto Teste 2", new BigDecimal("199.99"), "Descrição do Produto Teste 2", "imagem2.jpg", Categoria.LANCHE, LocalDate.now(), LocalDate.now());
+        List<Produto> expectedProdutos = Arrays.asList(produto1, produto2);
+
+        ResultSet resultSet = mock(ResultSet.class);
+        when(resultSet.next()).thenReturn(true, true, false);
+        when(resultSet.getInt("id")).thenReturn(produto1.getId(), produto2.getId());
+        when(resultSet.getString("nome")).thenReturn(produto1.getNome(), produto2.getNome());
+        when(resultSet.getBigDecimal("preco")).thenReturn(produto1.getPreco(), produto2.getPreco());
+        when(resultSet.getString("descricao")).thenReturn(produto1.getDescricao(), produto2.getDescricao());
+        when(resultSet.getString("imagem")).thenReturn(produto1.getImagem(), produto2.getImagem());
+        when(resultSet.getString("categoria")).thenReturn(produto1.getCategoria().name(), produto2.getCategoria().name());
+        when(resultSet.getObject("created_at", LocalDate.class)).thenReturn(produto1.getCreatedAt(), produto2.getCreatedAt());
+        when(resultSet.getObject("updated_at", LocalDate.class)).thenReturn(produto1.getUpdatedAt(), produto2.getUpdatedAt());
+
+        RowMapper<Produto> rowMapper = (rs, rowNum) -> new Produto(
+                rs.getInt("id"),
+                rs.getString("nome"),
+                rs.getBigDecimal("preco"),
+                rs.getString("descricao"),
+                rs.getString("imagem"),
+                Categoria.valueOf(rs.getString("categoria")),
+                rs.getObject("created_at", LocalDate.class),
+                rs.getObject("updated_at", LocalDate.class)
+        );
+
+        when(jdbcTemplate.query(eq(expectedSql), any(RowMapper.class))).thenAnswer(invocation -> {
+            RowMapper<Produto> mapper = invocation.getArgument(1);
+            return Arrays.asList(mapper.mapRow(resultSet, 0), mapper.mapRow(resultSet, 1));
+        });
+
+        // Act
+        List<Produto> actualProdutos = produtoRepository.findAll();
+
+        // Assert
+        assertEquals(expectedProdutos, actualProdutos);
+        verify(jdbcTemplate, times(1)).query(eq(expectedSql), any(RowMapper.class));
     }
 }
