@@ -9,10 +9,14 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 class ClienteRepositoryTest {
@@ -31,22 +35,22 @@ class ClienteRepositoryTest {
     @Test
     void testSave() {
         // Arrange
-        Cliente cliente = new Cliente(1, "John Doe", "john.doe@example.com");
-        String expectedSql = "INSERT INTO clientes (nome, email) VALUES (?, ?)";
+        Cliente cliente = new Cliente(1,"John Doe", "12345678901", "john.doe@example.com", "11999999999", LocalDate.now(), LocalDate.now());
+        String expectedSql = "INSERT INTO clientes (nome, cpf, email, telefone, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
 
         // Act
         clienteRepository.save(cliente);
 
         // Assert
-        verify(jdbcTemplate, times(1)).update(expectedSql, cliente.getNome(), cliente.getEmail());
+        verify(jdbcTemplate, times(1)).update(expectedSql, cliente.getNome(), cliente.getCpf(), cliente.getEmail(), cliente.getTelefone(), cliente.getCreatedAt(), cliente.getUpdatedAt());
     }
 
     @Test
     void testFindAll() {
         // Arrange
         String expectedSql = "SELECT * FROM clientes";
-        Cliente cliente1 = new Cliente(1, "John Doe", "john.doe@example.com");
-        Cliente cliente2 = new Cliente(2, "Jane Doe", "jane.doe@example.com");
+        Cliente cliente1 = new Cliente(1, "John Doe", "12345678901", "john.doe@example.com", "11999999999", LocalDate.now(), LocalDate.now());
+        Cliente cliente2 = new Cliente(2, "Jane Doe", "98765432101", "jane.doe@example.com", "11988888888", LocalDate.now(), LocalDate.now());
         List<Cliente> expectedClientes = Arrays.asList(cliente1, cliente2);
 
         // Use a specific RowMapper mock to ensure compatibility
@@ -64,7 +68,7 @@ class ClienteRepositoryTest {
     @Test
     void testUpdate() {
         // Arrange
-        Cliente cliente = new Cliente(1, "John Doe Updated", "john.doe.updated@example.com");
+        Cliente cliente = new Cliente(1, "John Doe", "12345678901", "john.doe@example.com", "11999999999", LocalDate.now(), LocalDate.now());
         String expectedSql = "UPDATE clientes SET nome = ?, email = ? WHERE id = ?";
 
         // Act
@@ -92,7 +96,7 @@ class ClienteRepositoryTest {
         // Arrange
         int id = 1;
         String expectedSql = "SELECT * FROM clientes WHERE id = ?";
-        Cliente expectedCliente = new Cliente(1, "John Doe", "john.doe@example.com");
+        Cliente expectedCliente = new Cliente(id, "John Doe", "12345678901", "john.doe@example.com", "11999999999", LocalDate.now(), LocalDate.now());
 
         when(jdbcTemplate.queryForObject(eq(expectedSql), any(RowMapper.class), eq(id))).thenReturn(expectedCliente);
 
