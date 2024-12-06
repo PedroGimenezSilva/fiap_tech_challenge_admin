@@ -1,5 +1,6 @@
 package br.com.challenge.admin.admin.controller;
 
+import br.com.challenge.admin.admin.domain.Categoria;
 import br.com.challenge.admin.admin.domain.Produto;
 import br.com.challenge.admin.admin.repository.ProdutoRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,7 +43,7 @@ class ProdutoControllerTest {
     void addProduto() throws Exception {
         Produto produto = new Produto();
         produto.setNome("Produto Teste");
-        produto.setPreco(99.99);
+        produto.setPreco(BigDecimal.valueOf(99.99));
 
         doNothing().when(produtoRepository).save(produto);
 
@@ -54,8 +57,8 @@ class ProdutoControllerTest {
     @Test
     void testGetProdutos() throws Exception {
         // Arrange
-        Produto produto1 = new Produto(1, "Produto 1", 10.00);
-        Produto produto2 = new Produto(2, "Produto 2", 20.00);
+        Produto produto1 = new Produto(1, "Produto 1", new BigDecimal("10.0"), "Descrição do Produto Teste", "imagem", Categoria.BEBIDA, LocalDate.now(), LocalDate.now());
+        Produto produto2 = new Produto(2, "Produto 2", new BigDecimal("20.0"), "Descrição do Produto Teste", "imagem", Categoria.BEBIDA, LocalDate.now(), LocalDate.now());
         List<Produto> produtos = Arrays.asList(produto1, produto2);
         when(produtoRepository.findAll()).thenReturn(produtos);
 
@@ -73,14 +76,14 @@ class ProdutoControllerTest {
     @Test
     void testGetProduto() throws Exception {
         // Arrange
-        Produto produto = new Produto(1, "Produto Teste", 19.99);
+        Produto produto = new Produto(1, "Produto 1", new BigDecimal("19.99"), "Descrição do Produto Teste", "imagem", Categoria.BEBIDA, LocalDate.now(), LocalDate.now());
         when(produtoRepository.findById(1)).thenReturn(produto);
 
         // Act & Assert
         mockMvc.perform(get("/api/admin/produtos/{id}", 1)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nome").value("Produto Teste"))
+                .andExpect(jsonPath("$.nome").value("Produto 1"))
                 .andExpect(jsonPath("$.preco").value(19.99));
 
         verify(produtoRepository, times(1)).findById(1);

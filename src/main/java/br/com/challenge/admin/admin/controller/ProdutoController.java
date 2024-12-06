@@ -1,5 +1,6 @@
 package br.com.challenge.admin.admin.controller;
 
+import br.com.challenge.admin.admin.domain.Categoria;
 import br.com.challenge.admin.admin.domain.Produto;
 import br.com.challenge.admin.admin.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
