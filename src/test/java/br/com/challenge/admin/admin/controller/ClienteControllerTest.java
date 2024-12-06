@@ -1,16 +1,7 @@
 package br.com.challenge.admin.admin.controller;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.Arrays;
-import java.util.List;
-
+import br.com.challenge.admin.admin.domain.Cliente;
+import br.com.challenge.admin.admin.repository.ClienteRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -21,8 +12,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import br.com.challenge.admin.admin.domain.Cliente;
-import br.com.challenge.admin.admin.repository.ClienteRepository;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 class ClienteControllerTest {
@@ -50,14 +47,14 @@ class ClienteControllerTest {
 
         doNothing().when(clienteRepository).save(cliente);
 
-        mockMvc.perform(post("/clientes")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"nome\":\"John Doe\",\"email\":\"john.doe@example.com\"}"))
+        mockMvc.perform(post("/api/admin/clientes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"nome\":\"John Doe\",\"email\":\"john.doe@example.com\"}"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Cliente adicionado com sucesso!"));
     }
 
-     @Test
+    @Test
     void getClientes() throws Exception {
         Cliente cliente1 = new Cliente(1, "John Doe", "john.doe@example.com");
         Cliente cliente2 = new Cliente(2, "Jane Doe", "jane.doe@example.com");
@@ -65,7 +62,7 @@ class ClienteControllerTest {
 
         when(clienteRepository.findAll()).thenReturn(clientes);
 
-        mockMvc.perform(get("/clientes"))
+        mockMvc.perform(get("/api/admin/clientes"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("[{'id':1,'nome':'John Doe','email':'john.doe@example.com'},{'id':2,'nome':'Jane Doe','email':'jane.doe@example.com'}]"));
     }
@@ -76,7 +73,7 @@ class ClienteControllerTest {
 
         when(clienteRepository.findById(1)).thenReturn(cliente);
 
-        mockMvc.perform(get("/clientes/1"))
+        mockMvc.perform(get("/api/admin/clientes/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{'id':1,'nome':'John Doe','email':'john.doe@example.com'}"));
     }
@@ -85,7 +82,7 @@ class ClienteControllerTest {
     void deleteCliente() throws Exception {
         doNothing().when(clienteRepository).delete(1);
 
-        mockMvc.perform(delete("/clientes/1"))
+        mockMvc.perform(delete("/api/admin/clientes/1"))
                 .andExpect(status().isNoContent());
     }
 }

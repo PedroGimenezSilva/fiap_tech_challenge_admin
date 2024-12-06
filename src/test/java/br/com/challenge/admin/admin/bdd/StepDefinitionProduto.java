@@ -22,7 +22,7 @@ public class StepDefinitionProduto {
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES) // Ignore unrecognized properties
             .registerModule(new JavaTimeModule());
 
-    private final String ENDPOINT_API_PRODUTO = "http://localhost:8082/produtos";
+    private final String ENDPOINT_API_PRODUTO = "http://localhost:8082/api/admin/produtos";
     private Produto produto;
 
     @Quando("crio um produto")

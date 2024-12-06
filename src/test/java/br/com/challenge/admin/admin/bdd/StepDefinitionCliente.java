@@ -22,7 +22,7 @@ public class StepDefinitionCliente {
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES) // Ignore unrecognized properties
             .registerModule(new JavaTimeModule());
 
-    private final String ENDPOINT_API_CLIENTE = "http://localhost:8082/clientes";
+    private final String ENDPOINT_API_CLIENTE = "http://localhost:8082/api/admin/clientes";
     private Cliente cliente;
 
     @Quando("crio um cliente")
