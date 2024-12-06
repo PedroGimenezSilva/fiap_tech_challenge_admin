@@ -1,6 +1,10 @@
-API Admin
+# API Admin
 
-Banco de dados: Mysql
+## CRUD de produtos e também de clientes
+
+### Banco de dados:
+
+Mysql
 
 Link de
 uma [verificação de cobertura](https://github.com/PedroGimenezSilva/fiap_tech_challenge_admin/actions/runs/12193386444/job/34015557897?pr=3).
